@@ -5,15 +5,15 @@ use crate::task::{TaskId, Task};
 
 #[derive(Debug)]
 pub struct Store {
-    tasks: HashMap<TaskId, Task>
+    pub tasks: HashMap<TaskId, Task>
 }
 
 impl Store {
-    fn builder() -> StoreBuilder {
+    pub fn builder() -> StoreBuilder {
         StoreBuilder::new()
     }
 
-    fn get(&self, id: &TaskId) -> &Task {
+    pub fn get(&self, id: &TaskId) -> &Task {
         // Unwrap is safe, because all ids were validated by StoreBuilder
         self.tasks.get(id).unwrap()
     }
@@ -38,7 +38,7 @@ impl std::fmt::Display for StoreBuilderError {
 }
 
 #[derive(Debug)]
-struct StoreBuilder {
+pub struct StoreBuilder {
     tasks: Vec<Task>
 }
 
@@ -47,12 +47,12 @@ impl StoreBuilder {
         Self { tasks: vec![] }
     }
 
-    fn add(mut self, task: Task) -> Self {
+    pub fn add(mut self, task: Task) -> Self {
         self.tasks.push(task);
         self
     }
 
-    fn build(self) -> Result<Store, StoreBuilderError> {
+    pub fn build(self) -> Result<Store, StoreBuilderError> {
         let mut tasks_map: HashMap<TaskId, Task> = HashMap::new();
 
         let known_ids: Vec<TaskId> = self.tasks.iter().map(|u| u.id.clone()).collect();
