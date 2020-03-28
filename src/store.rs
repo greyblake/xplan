@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::hash::Hash;
 
+use thiserror::Error;
+
 use crate::task::{TaskId, Task};
 
 #[derive(Debug)]
@@ -19,21 +21,12 @@ impl Store {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Error)]
 pub enum StoreBuilderError {
+    #[error("Task '{host}' refers to '{dep}', but '{dep}' is not defined.")]
     MissingDependecy {
         host: TaskId,
         dep: TaskId
-    }
-}
-
-impl std::fmt::Display for StoreBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::MissingDependecy { host, dep } => {
-                write!(f, "Task '{}' refers to '{}', but '{}' is not defined.", host, dep, dep)
-            }
-        }
     }
 }
 

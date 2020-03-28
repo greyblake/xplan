@@ -29,3 +29,9 @@ impl std::fmt::Display for TaskId {
         write!(f, "{}", self.0)
     }
 }
+
+impl TaskType {
+    pub fn new(val: String) -> Self {
+        Self(val)
+    }
+}
