@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 use std::hash::Hash;
 
-use crate::unit::{UnitId, Unit};
+use crate::task::{TaskId, Task};
 
 #[derive(Debug)]
 pub struct Store {
-    units: HashMap<UnitId, Unit>
+    tasks: HashMap<TaskId, Task>
 }
 
 impl Store {
@@ -13,17 +13,17 @@ impl Store {
         StoreBuilder::new()
     }
 
-    fn get(&self, id: &UnitId) -> &Unit {
+    fn get(&self, id: &TaskId) -> &Task {
         // Unwrap is safe, because all ids were validated by StoreBuilder
-        self.units.get(id).unwrap()
+        self.tasks.get(id).unwrap()
     }
 }
 
 #[derive(Debug)]
 pub enum StoreBuilderError {
     MissingDependecy {
-        host: UnitId,
-        dep: UnitId
+        host: TaskId,
+        dep: TaskId
     }
 }
 
@@ -31,7 +31,7 @@ impl std::fmt::Display for StoreBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::MissingDependecy { host, dep } => {
-                write!(f, "Unit '{}' refers to '{}', but '{}' is not defined.", host, dep, dep)
+                write!(f, "Task '{}' refers to '{}', but '{}' is not defined.", host, dep, dep)
             }
         }
     }
@@ -39,38 +39,38 @@ impl std::fmt::Display for StoreBuilderError {
 
 #[derive(Debug)]
 struct StoreBuilder {
-    units: Vec<Unit>
+    tasks: Vec<Task>
 }
 
 impl StoreBuilder {
     fn new() -> Self {
-        Self { units: vec![] }
+        Self { tasks: vec![] }
     }
 
-    fn add(mut self, unit: Unit) -> Self {
-        self.units.push(unit);
+    fn add(mut self, task: Task) -> Self {
+        self.tasks.push(task);
         self
     }
 
     fn build(self) -> Result<Store, StoreBuilderError> {
-        let mut units_map: HashMap<UnitId, Unit> = HashMap::new();
+        let mut tasks_map: HashMap<TaskId, Task> = HashMap::new();
 
-        let known_ids: Vec<UnitId> = self.units.iter().map(|u| u.id.clone()).collect();
+        let known_ids: Vec<TaskId> = self.tasks.iter().map(|u| u.id.clone()).collect();
 
-        for unit in self.units.into_iter() {
+        for task in self.tasks.into_iter() {
             // Check dependencies
-            for dep_id in unit.deps.iter() {
+            for dep_id in task.deps.iter() {
                 if !known_ids.contains(dep_id) {
-                    let e = StoreBuilderError::MissingDependecy { host: unit.id.clone(), dep: dep_id.clone() };
+                    let e = StoreBuilderError::MissingDependecy { host: task.id.clone(), dep: dep_id.clone() };
                     return Err(e);
                 }
             }
 
             // Add to HashMap
-            units_map.insert(unit.id.clone(), unit);
+            tasks_map.insert(task.id.clone(), task);
         }
 
-        let store = Store { units: units_map };
+        let store = Store { tasks: tasks_map };
         Ok(store)
     }
 }
@@ -79,45 +79,45 @@ impl StoreBuilder {
 mod tests {
     use super::*;
 
-    fn unit<S: Into<UnitId>>(id: S) -> Unit {
-        unit_with_deps(id, Vec::new())
+    fn task<S: Into<TaskId>>(id: S) -> Task {
+        task_with_deps(id, Vec::new())
     }
 
-    fn unit_with_deps<T: Into<UnitId>>(id: T, deps: Vec<T>) -> Unit {
-        Unit {
+    fn task_with_deps<T: Into<TaskId>>(id: T, deps: Vec<T>) -> Task {
+        Task {
             id: id.into(),
             name: None,
             deps: deps.into_iter().map(|d| d.into()).collect(),
-            unit_type: None
+            task_type: None
         }
     }
 
     #[test]
     fn test_builder_ok() {
         let store = Store::builder()
-            .add(unit("A"))
-            .add(unit("B"))
+            .add(task("A"))
+            .add(task("B"))
             .build()
             .unwrap();
 
-        let a_id = UnitId::from("A");
-        assert_eq!(store.get(&a_id), &unit("A"));
+        let a_id = TaskId::from("A");
+        assert_eq!(store.get(&a_id), &task("A"));
 
-        let b_id = UnitId::from("B");
-        assert_eq!(store.get(&b_id), &unit("B"));
+        let b_id = TaskId::from("B");
+        assert_eq!(store.get(&b_id), &task("B"));
     }
 
     #[test]
     fn test_builder_err() {
         let err = Store::builder()
-            .add(unit("A"))
-            .add(unit_with_deps("B", vec!["Z"]))
+            .add(task("A"))
+            .add(task_with_deps("B", vec!["Z"]))
             .build()
             .unwrap_err();
 
         assert_eq!(
             format!("{}", err),
-            "Unit 'B' refers to 'Z', but 'Z' is not defined."
+            "Task 'B' refers to 'Z', but 'Z' is not defined."
         )
     }
 }
