@@ -67,7 +67,7 @@ pub fn parse_task(key: &Yaml, body: &Yaml) -> Result<Task> {
         },
         Yaml::Null => {},
         _ => {
-            let msg = format!("Invalid element: tasks.{}", id);
+            let msg = format!("Invalid type of element: tasks.{} ({:?})", id, body);
             return Err(ParseError::Base(msg))
         }
     }

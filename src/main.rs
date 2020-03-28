@@ -1,33 +1,23 @@
-use std::collections::HashMap;
-use std::hash::Hash;
+use std::fs::File;
+use std::io::{Read, BufReader};
 
-use xplan::task::{TaskId, Task};
-use xplan::store::{Store};
+use xplan::parser::parse;
 use xplan::dot::render;
 
-
 fn main() {
-    let store = Store::builder()
-        .add(task("A"))
-        .add(task_with_deps("B", vec!["A"]))
-        .add(task_with_deps("C", vec!["A", "B"]))
-        .add(task_with_deps("D", vec!["A", "C"]))
-        .build()
-        .unwrap();
+    let file_path = "input.yml";
+    let file = File::open(file_path).unwrap();
+
+    let mut buf_reader = BufReader::new(file);
+    let mut yaml = String::new();
+    buf_reader.read_to_string(&mut yaml).unwrap();
+
+    let store = parse(&yaml).unwrap_or_else(|e| {
+        eprintln!("{}", e);
+        std::process::exit(1);
+    });
 
     let mut stdout = std::io::stdout();
-    render(&mut stdout, &store);
+    render(&mut stdout, &store).unwrap();
 }
 
-fn task<S: Into<TaskId>>(id: S) -> Task {
-    task_with_deps(id, Vec::new())
-}
-
-fn task_with_deps<T: Into<TaskId>>(id: T, deps: Vec<T>) -> Task {
-    Task {
-        id: id.into(),
-        name: None,
-        deps: deps.into_iter().map(|d| d.into()).collect(),
-        task_type: None
-    }
-}

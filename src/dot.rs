@@ -2,28 +2,36 @@ use std::io::Write;
 
 use crate::store::Store;
 
-pub fn render<T: Write>(buf: &mut T, store: &Store) {
-    write!(buf, "digraph G {{\n");
+type Result = std::result::Result<(), std::io::Error>;
 
-    declare_nodes(buf, store);
-    declare_deps(buf, store);
+pub fn render<T: Write>(buf: &mut T, store: &Store) -> Result {
+    write!(buf, "digraph G {{\n")?;
 
-    write!(buf, "}}\n");
+    declare_nodes(buf, store)?;
+    declare_deps(buf, store)?;
+
+    write!(buf, "}}\n")?;
+
+    Ok(())
 }
 
-pub fn declare_nodes<T: Write>(buf: &mut T, store: &Store) {
-    write!(buf, "  # Declare nodes\n");
+fn declare_nodes<T: Write>(buf: &mut T, store: &Store) -> Result {
+    write!(buf, "  # Declare nodes\n")?;
     for task in store.tasks.values() {
-        write!(buf, "  \"{}\"\n", task.id);
+        write!(buf, "  \"{}\"\n", task.id)?;
     }
-    write!(buf, "\n");
+    write!(buf, "\n")?;
+
+    Ok(())
 }
 
-pub fn declare_deps<T: Write>(buf: &mut T, store: &Store) {
-    write!(buf, "  # Declare dependencies\n");
+fn declare_deps<T: Write>(buf: &mut T, store: &Store) -> Result {
+    write!(buf, "  # Declare dependencies\n")?;
     for task in store.tasks.values() {
         for dep in task.deps.iter() {
-            write!(buf, "  \"{}\" -> \"{}\"\n", dep, task.id);
+            write!(buf, "  \"{}\" -> \"{}\"\n", dep, task.id)?;
         }
     }
+
+    Ok(())
 }
