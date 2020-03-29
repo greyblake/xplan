@@ -1,7 +1,7 @@
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct TaskId(String);
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct TaskType(String);
 
 #[derive(Debug, PartialEq)]
@@ -33,5 +33,11 @@ impl std::fmt::Display for TaskId {
 impl TaskType {
     pub fn new(val: String) -> Self {
         Self(val)
+    }
+}
+
+impl std::fmt::Display for TaskType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
     }
 }

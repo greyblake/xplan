@@ -2,11 +2,12 @@ use std::collections::HashMap;
 
 use thiserror::Error;
 
-use crate::task::{TaskId, Task};
+use crate::task::{TaskId, TaskType, Task};
 
 #[derive(Debug)]
 pub struct Store {
-    pub tasks: HashMap<TaskId, Task>
+    pub tasks: HashMap<TaskId, Task>,
+    pub task_types: Vec<TaskType>
 }
 
 impl Store {
@@ -31,15 +32,24 @@ pub enum StoreBuilderError {
 
 #[derive(Debug)]
 pub struct StoreBuilder {
-    tasks: Vec<Task>
+    tasks: Vec<Task>,
+    task_types: Vec<TaskType>
 }
 
 impl StoreBuilder {
     fn new() -> Self {
-        Self { tasks: vec![] }
+        Self {
+            tasks: vec![] ,
+            task_types: vec![],
+        }
     }
 
     pub fn add(mut self, task: Task) -> Self {
+        if let Some(tp) = &task.task_type {
+            if !self.task_types.contains(tp) {
+                self.task_types.push((*tp).clone())
+            }
+        }
         self.tasks.push(task);
         self
     }
@@ -62,7 +72,7 @@ impl StoreBuilder {
             tasks_map.insert(task.id.clone(), task);
         }
 
-        let store = Store { tasks: tasks_map };
+        let store = Store { tasks: tasks_map, task_types: self.task_types };
         Ok(store)
     }
 }
