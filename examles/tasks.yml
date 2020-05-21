@@ -1,0 +1,52 @@
+tasks:
+  XYZ-1:
+    name: "Imlpement User model"
+    type: Backend
+  XYZ-2:
+    name: "Implement Product model"
+    type: Backend
+  XYZ-3:
+    name: "Implement Purchase model"
+    type: Backend
+    deps: [XYZ-1]
+
+  XYZ-4:
+    name: "Implement Users API endpoints"
+    type: Backend
+    deps: [XYZ-1, XYZ-7]
+  XYZ-5:
+    name: "Implement Products API endpoints"
+    type: Backend
+    deps: [XYZ-2, XYZ-8]
+  XYZ-6:
+    name: "Implement Purchases API endpoints"
+    type: Backend
+    deps: [XYZ-2, XYZ-1, XYZ-9]
+
+  XYZ-7:
+    name: "Define Users API"
+    type: Common
+  XYZ-8:
+    name: "Define Products API"
+    type: Common
+  XYZ-9:
+    name: "Define Purchases API"
+    type: Common
+
+  XYZ-10:
+    name: "Display available products"
+    type: Frontend
+    deps: [XYZ-5]
+  XYZ-11:
+    name: "Sign up & Sign in"
+    type: Frontend
+    deps: [XYZ-4]
+  XYZ-12:
+    name: "Allow users to create and see purchases"
+    type: Frontend
+    deps: [XYZ-6]
+
+  XYZ-13:
+    name: "Acceptance Test"
+    type: Common
+    deps: [XYZ-10, XYZ-11, XYZ-12]
