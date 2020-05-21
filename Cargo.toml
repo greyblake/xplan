@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 yaml-rust = "0.4.3"
 thiserror = "*"
+structopt = "0.3.9"
