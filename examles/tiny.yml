@@ -1,0 +1,40 @@
+tasks:
+  TIN-1:
+    name: define User model
+    type: common
+  TIN-2:
+    name: create users table
+    type: backend
+    deps: [TIN-1]
+
+  TIN-9:
+    name: define register endpoint
+    type: common
+    deps: [TIN-1]
+  TIN-10:
+    name: define login endpoint
+    type: common
+    deps: [TIN-1]
+
+  TIN-3:
+    name: implement register API endpoint
+    type: backend
+    deps: [TIN-2, TIN-9]
+  TIN-4:
+    name: implement login API endpoint
+    type: backend
+    deps: [TIN-2, TIN-10]
+  TIN-5:
+    name: UI mock for Register page
+    type: design
+  TIN-6:
+    name: UI mock for Login page
+    type: design
+  TIN-7:
+    name: Implement Register page
+    type: frontend
+    deps: [TIN-3, TIN-5]
+  TIN-8:
+    name: Implement Login page
+    type: frontend
+    deps: [TIN-4, TIN-6]
