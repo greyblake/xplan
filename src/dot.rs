@@ -64,7 +64,6 @@ impl<'a, T: Write> Renderer<'a, T> {
 
     fn define_node(&mut self, task: &Task) -> Result {
         let label = build_label(task);
-        //let color_opt = self.config.type_color_map.get(task.task_type);
 
         write!(self.buf, "  \"{}\" ", task.id)?;
         write!(self.buf, "[")?;

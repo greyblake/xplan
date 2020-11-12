@@ -3,7 +3,7 @@ pub mod helpers;
 
 use error::ParseError;
 use helpers::{parse_yaml_to_string, parse_yaml_to_vec};
-use crate::task::{Task, TaskId, TaskType};
+use crate::task::{Task, TaskId, TaskType, TaskName};
 use crate::store::Store;
 
 use yaml_rust::{yaml::Yaml, YamlLoader};
@@ -46,7 +46,7 @@ pub fn parse_task(key: &Yaml, body: &Yaml) -> Result<Task> {
                 match attr_key.as_ref() {
                     "name" => {
                         let name_val = parse_yaml_to_string(&attr_yaml_val)?;
-                        name = Some(name_val);
+                        name = Some(TaskName::new(name_val));
                     },
                     "deps" => {
                         let deps_str = parse_yaml_to_vec(&attr_yaml_val)?;
@@ -134,7 +134,7 @@ mod tests {
         assert_eq!(store.tasks.len(), 3);
 
         let id_a = TaskId::new("A".to_owned());
-        assert_eq!(store.get(&id_a).name, Some("Do A".to_owned()));
+        assert_eq!(store.get(&id_a).name, Some(TaskName::new("Do A".to_owned())));
 
         let id_b = TaskId::new("B".to_owned());
         assert_eq!(store.get(&id_b).deps, vec![id_a]);
